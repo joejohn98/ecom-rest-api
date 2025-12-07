@@ -1,12 +1,12 @@
 import express from "express"
-import { allProducts } from "../controllers/productController";
+import { addProduct, allProducts } from "../controllers/productController";
 
 const router = express.Router();
 
 router.get("/", allProducts)
 
 
-
+router.post("/", addProduct)
 
 
 

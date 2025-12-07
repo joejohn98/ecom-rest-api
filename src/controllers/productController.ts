@@ -1,7 +1,7 @@
 import type { Request, Response } from "express";
 import Product from "../models/Product";
 
-const allProducts = async (req: Request, res: Response) => {
+const allProducts = async (req: Request, res: Response): Promise<void> => {
   try {
     const products = await Product.find().sort({ createdAt: -1 });
     res.status(200).json({
@@ -18,5 +18,36 @@ const allProducts = async (req: Request, res: Response) => {
   }
 };
 
+const addProduct = async (req: Request, res: Response): Promise<void> => {
+  const { title, description, price, category } = req.body;
 
-export { allProducts };
+  if (!title || !description || !price || !category) {
+    res.status(400).json({
+      status: "fail",
+      message: "Title, description, price and category are required",
+    });
+    return;
+  }
+
+  try {
+    const newProduct = await Product.create({
+      title,
+      description,
+      price,
+      category,
+    });
+    res.status(201).json({
+      status: "success",
+      message: "Product added successfully",
+      data: newProduct,
+    });
+  } catch (error) {
+    console.log("Error adding product:", error);
+    res.status(500).json({
+      status: "fail",
+      message: "failed to add product",
+    });
+  }
+};
+
+export { allProducts, addProduct };
