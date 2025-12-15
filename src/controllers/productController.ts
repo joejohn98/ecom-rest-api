@@ -4,7 +4,9 @@ import mongoose from "mongoose";
 
 const allProducts = async (req: Request, res: Response): Promise<void> => {
   try {
-    const products = await Product.find().sort({ createdAt: -1 });
+    const products = await Product.find()
+      .select("-__v")
+      .sort({ createdAt: -1 });
     res.status(200).json({
       status: "success",
       results: products.length,
