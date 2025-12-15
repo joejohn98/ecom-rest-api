@@ -1,5 +1,6 @@
 import type { Request, Response } from "express";
 import Product from "../models/Product";
+import mongoose from "mongoose";
 
 const allProducts = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -50,4 +51,41 @@ const addProduct = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-export { allProducts, addProduct };
+const updateProduct = async (req: Request, res: Response): Promise<void> => {
+  const { id } = req.params;
+
+  if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+    res.status(400).json({
+      status: "fail",
+      message: "Invalid product ID format or missing ID",
+    });
+    return;
+  }
+
+  try {
+    const updatedProduct = await Product.findByIdAndUpdate(id, req.body, {
+      new: true,
+      runValidators: true,
+    });
+    if (!updatedProduct) {
+      res.status(404).json({
+        status: "fail",
+        message: "Product not found",
+      });
+      return;
+    }
+    res.status(200).json({
+      status: "success",
+      message: "Product updated successfully",
+      updatedProduct,
+    });
+  } catch (error) {
+    console.log("Error updating product", error);
+    res.status(500).json({
+      status: "fail",
+      message: "failed to update product",
+    });
+  }
+};
+
+export { allProducts, addProduct, updateProduct};
