@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { title } from "process";
+
 
 const productSchema = new mongoose.Schema(
   {
@@ -20,9 +20,9 @@ const productSchema = new mongoose.Schema(
       required: [true, "Price is required"],
     },
     category: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Category",
       required: [true, "Category is required"],
-      enum: ["Electronics", "Books", "Accessories", "Other"],
     },
     quantity: {
       type: Number,

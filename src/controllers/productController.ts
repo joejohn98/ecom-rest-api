@@ -21,6 +21,39 @@ const allProducts = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
+const getSingleProduct = async (req: Request, res: Response): Promise<void> => {
+  const { id } = req.params;
+
+  if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+    res.status(400).json({
+      status: "fail",
+      message: "Invalid product ID format or missing ID",
+    });
+    return;
+  }
+
+  try {
+    const product = await Product.findById(id).select("-__v");
+    if (!product) {
+      res.status(404).json({
+        status: "fail",
+        message: "Product not found",
+      });  
+      return;
+    }
+    res.status(200).json({
+      status: "success",
+      data: product,
+    });
+  } catch (error) {
+    console.log("Error fetching product:", error);
+    res.status(500).json({
+      status: "fail",
+      message: "failed to fetch product",
+    });
+  }
+};
+
 const addProduct = async (req: Request, res: Response): Promise<void> => {
   const { title, description, price, category } = req.body;
 
@@ -124,4 +157,10 @@ const deleteProduct = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-export { allProducts, addProduct, updateProduct, deleteProduct };
+export {
+  allProducts,
+  addProduct,
+  updateProduct,
+  deleteProduct,
+  getSingleProduct,
+};

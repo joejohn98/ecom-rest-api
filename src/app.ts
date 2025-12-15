@@ -3,6 +3,7 @@ import cors from "cors";
 import morgan from "morgan";
 
 import productRouter from "./routes/productRouter";
+import categoryRouter from "./routes/categoriesRouter";
 
 const app: Application = express();
 
@@ -16,5 +17,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/products", productRouter);
+
+app.use("/api/categories", categoryRouter);
 
 export default app;
