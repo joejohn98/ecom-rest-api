@@ -32,6 +32,15 @@ const addCategory = async (req: Request, res: Response): Promise<void> => {
     return;
   }
 
+  const existingCategory = await Category.findOne({ name });
+  if (existingCategory) {
+    res.status(400).json({
+      status: "fail",
+      message: "Category with this name already exists",
+    });
+    return;
+  }
+
   try {
     const newCategory = await Category.create({
       name,
@@ -100,7 +109,7 @@ const deleteCategory = async (req: Request, res: Response): Promise<void> => {
 
   try {
     const deletedCategory = await Category.findByIdAndDelete(id);
-    if (!deletedCategory ) {
+    if (!deletedCategory) {
       res.status(404).json({
         status: "fail",
         message: "Category not found",
@@ -121,9 +130,4 @@ const deleteCategory = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-export {
-    allCategories,
-    addCategory,
-    updateCategory,
-    deleteCategory
-};
+export { allCategories, addCategory, updateCategory, deleteCategory };

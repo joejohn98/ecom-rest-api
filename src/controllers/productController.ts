@@ -1,11 +1,13 @@
 import type { Request, Response } from "express";
 import Product from "../models/Product";
+import Category from "../models/category";
 import mongoose from "mongoose";
 
 const allProducts = async (req: Request, res: Response): Promise<void> => {
   try {
     const products = await Product.find()
       .select("-__v")
+      .populate("category", "name -_id")
       .sort({ createdAt: -1 });
     res.status(200).json({
       status: "success",
@@ -33,12 +35,12 @@ const getSingleProduct = async (req: Request, res: Response): Promise<void> => {
   }
 
   try {
-    const product = await Product.findById(id).select("-__v");
+    const product = await Product.findById(id).select("-__v").populate("category", "name _id");
     if (!product) {
       res.status(404).json({
         status: "fail",
         message: "Product not found",
-      });  
+      });
       return;
     }
     res.status(200).json({
@@ -61,6 +63,14 @@ const addProduct = async (req: Request, res: Response): Promise<void> => {
     res.status(400).json({
       status: "fail",
       message: "Title, description, price and category are required",
+    });
+    return;
+  }
+  const categoryExists = await Category.findById(category);
+  if (!categoryExists) {
+    res.status(400).json({
+      status: "fail",
+      message: "Provided category does not exist",
     });
     return;
   }

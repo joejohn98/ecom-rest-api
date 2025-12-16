@@ -17,6 +17,4 @@ router.get("/product/:id", getSingleProduct)
 
 
 
-
-
 export default router;
