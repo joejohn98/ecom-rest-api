@@ -35,7 +35,9 @@ const getSingleProduct = async (req: Request, res: Response): Promise<void> => {
   }
 
   try {
-    const product = await Product.findById(id).select("-__v").populate("category", "name _id");
+    const product = await Product.findById(id)
+      .select("-__v")
+      .populate("category", "name _id");
     if (!product) {
       res.status(404).json({
         status: "fail",
@@ -52,6 +54,47 @@ const getSingleProduct = async (req: Request, res: Response): Promise<void> => {
     res.status(500).json({
       status: "fail",
       message: "failed to fetch product",
+    });
+  }
+};
+
+const getProductsByCategory = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const { id } = req.params;
+
+  if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+    res.status(400).json({
+      status: "fail",
+      message: "Invalid category ID format or missing ID",
+    });
+    return;
+  }
+
+  const categoryExists = await Category.findById(id);
+  if (!categoryExists) {
+    res.status(404).json({
+      status: "fail",
+      message: "Category not found",
+    });
+    return;
+  }
+
+  try {
+    const products = await Product.find({ category: id })
+      .select("-__v")
+      .populate("category", "name -_id");
+    res.status(200).json({
+      status: "success",
+      results: products.length,
+      data: products,
+    });
+  } catch (error) {
+    console.log("Error fetching products by category:", error);
+    res.status(500).json({
+      status: "fail",
+      message: "failed to fetch products by category",
     });
   }
 };
@@ -173,4 +216,5 @@ export {
   updateProduct,
   deleteProduct,
   getSingleProduct,
+  getProductsByCategory,
 };

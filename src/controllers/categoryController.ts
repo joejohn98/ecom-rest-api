@@ -1,6 +1,8 @@
 import type { Request, Response } from "express";
-import Category from "../models/category";
 import mongoose from "mongoose";
+
+import Category from "../models/category";
+import Product from "../models/Product";
 
 const allCategories = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -103,6 +105,16 @@ const deleteCategory = async (req: Request, res: Response): Promise<void> => {
     res.status(400).json({
       status: "fail",
       message: "Invalid Category ID format or missing ID",
+    });
+    return;
+  }
+
+  const productsInCategory = await Product.find({ category: id });
+
+  if (productsInCategory.length > 0) {
+    res.status(400).json({
+      status: "fail",
+      message: `Cannot delete category. There are ${productsInCategory.length} products associated with this category.`,
     });
     return;
   }
